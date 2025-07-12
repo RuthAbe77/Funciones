@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfico Poblacional Interactivo</title>
+  <style>
+    body { text-align: center; font-family: sans-serif; background-color: #eef; }
+    canvas { border: 1px solid #333; background-color: #fff; margin: 20px auto; display: block; }
+    #slider { width: 80%; margin-top: 20px; }
+    #output { font-size: 1.2em; color: #003366; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h2>📈 Crecimiento Poblacional de Venezuela (1975–2086)</h2>
+  <h3>P(t) = 8.14•e^{0.0263t}</h3>
+  <canvas id="canvas" width="600" height="300"></canvas>
+  <input type="range" id="slider" min="0" max="111" value="0">
+  <div id="output">Año: 1975 — Población: 8.14 millones</div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const slider = document.getElementById("slider");
+    const output = document.getElementById("output");
+
+    const P0 = 8.14;
+    const r = 0.0263;
+    const maxT = 111;
+
+    function population(t) {
+      return P0 * Math.exp(r * t);
+    }
+
+    function drawGraph(highlightYear) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Ajustar escala vertical según el máximo esperado
+      const maxPop = population(maxT);
+      for (let t = 0; t <= maxT; t++) {
+        let x = (t / maxT) * canvas.width;
+        let y = canvas.height - (population(t) / maxPop) * canvas.height;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = (t === highlightYear) ? "#ff0000" : "#004488";
+        ctx.fill();
+      }
+    }
+
+    slider.addEventListener("input", () => {
+      const t = parseInt(slider.value);
+      const year = 1975 + t;
+      const pop = population(t).toFixed(2);
+      output.textContent = `Año: ${year} — Población: ${pop} millones`;
+      drawGraph(t);
+    });
+
+    drawGraph(0);
+  </script>
+</body>
+</html>
